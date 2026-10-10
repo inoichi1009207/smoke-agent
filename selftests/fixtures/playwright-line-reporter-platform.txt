@@ -1,0 +1,30 @@
+[verify] playwright exit=1
+[verify] playwright failures:
+[1A[2K[1/2] test-e2e/REQ-6.spec.js:4:1 › REQ-6.1: Items and styling
+[1A[2K  1) test-e2e/REQ-6.spec.js:4:1 › REQ-6.1: Items and styling ───────────────────────────────────────
+    Error: The requirement says there is exactly one button named Archive on the whole page, but 19 are visible. (If the requirement speaks of one inside a part of the page -- the sidebar, a dialog, a form, a list -- the SPEC must pass that part as scope.)
+    > 35 |   throw new Error(`${what}\n  url: ${page.url()}\n  on the page now -> clickable: ${JSON.stringify(inv.clickable || [])}` +
+    Error Context: test-results/REQ-6-REQ-6-1-Items-and-styling/error-context.md
+[1A[2K[2/2] test-e2e/REQ-6.spec.js:13:1 › REQ-6.2: Collapsible Sidebar
+    test-e2e/REQ-6.spec.js:4:1 › REQ-6.1: Items and styling ────────────────────────────────────────
+[tdd] advisory component tests failing (non-blocking)
+[codegen] REQ-6 round 0: check failing
+[codegen] failures:
+E2E FAILED against the real application
+[1A[2K[1/2] test-e2e/REQ-6.spec.js:4:1 › REQ-6.1: Items and styling
+[1A[2K  1) test-e2e/REQ-6.spec.js:4:1 › REQ-6.1: Items and styling ───────────────────────────────────────
+    Error: The requirement says there is exactly one button named Archive on the whole page, but 19 are visible. (If the requirement speaks of one inside a part of the page -- the sidebar, a dialog, a form, a list -- the SPEC must pass that part as scope.)
+    > 35 |   throw new Error(`${what}\n  url: ${page.url()}\n  on the page now -> clickable: ${JSON.stringify(inv.clickable || [])}` +
+    Error Context: test-results/REQ-6-REQ-6-1-Items-and-styling/error-context.md
+[1A[2K[2/2] test-e2e/REQ-6.spec.js:13:1 › REQ-6.2: Collapsible Sidebar
+    test-e2e/REQ-6.spec.js:4:1 › REQ-6.1: Items and styling ────────────────────────────────────────
+     16|     expect(trashButton).toBeInTheDocument();
+ FAIL  tests/REQ-3.test.tsx > REQ-3.1: initial suggested filters > shows a suggestions listbox with a Reminders button when Search is focused
+ReferenceError: within is not defined
+     24|     expect(listbox).toBeInTheDocument();
+     25|     expect(
+ FAIL  tests/REQ-6.test.tsx > REQ-6.1: sidebar items > shows an expanded complementary sidebar with the five unique named buttons
+ReferenceError: within is not defined
+     19|     expect(sidebar).toBeInTheDocument();
+     21|       expect(
+ FAIL  tests/REQ-6.test.tsx > REQ-6.2: collapsible sidebar > toggles aria-expanded false then true and shows the buttons again

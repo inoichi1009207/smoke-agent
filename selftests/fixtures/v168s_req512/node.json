@@ -1,0 +1,58 @@
+{
+ "id": "REQ-5-1-2",
+ "name": "Filter Rows by Value or Condition",
+ "description": "Original Feature Description\n\nUsers create a filter for a data region with headers in the current active worksheet through \"Create filter\" in the \"Data\" menu. Each header provides a button with the accessible name \"Filter <header text>\"; the dialog with the same name supports selecting specific values and condition options named \"Text contains\", \"Greater than\", \"Before\", \"Is empty\", and \"Is not empty\". The value-filter dialog provides \"Clear selection\", checkboxes generated from distinct source values, and \"Apply\"; each checkbox uses the displayed source value as its accessible name. The condition dialog provides a combo box labeled \"Condition\", a text box labeled \"Value\", and \"Apply\". \"Text contains\", \"Greater than\", and \"Before\" use the \"Value\" text box; \"Is empty\" and \"Is not empty\" require no value. Conditions on different columns are combined with AND; nonmatching rows are hidden only and are neither deleted nor reordered. After refresh or reopening, the same rows remain visible. CSV export and pivot summarization still include hidden rows within the filtered range. \"Clear filter\" restores all source records in their original order and with their original values; after refresh all remain visible, while formula and validation behavior are unchanged.\n\nModified Feature Description\n\nA currently applied filter can be saved through \"Save filter view\" in the\n\"Data\" menu. The save interface has a text box labeled\n\"Filter view name\" and a \"Save view\" button. Names are trimmed, nonempty,\nand unique within the workbook; duplicates display \"Filter view name already\nexists\" and remains open after a rejected save. \"Filter views\" opens a\nview-management interface with controls named for saved views. Choosing a\nview replaces current filters and keeps that interface open with the view\nselected; \"Delete filter view\" removes\nthe selected view, restores all source rows, and leaves their values unchanged. Saved views and their\ncriteria persist after refresh.\n",
+ "scenarios": [
+  {
+   "name": "REQ-5-1-2 - save a two-condition filter view",
+   "steps": [
+    {
+     "keyword": "GIVEN",
+     "content": "The visitor is unauthenticated and the system pre-provisions workbook `EVO-M04-FILTER-SAVE` with active worksheet `Workload`, range D3:F7 headed `Workstream/Phase/Load`, and rows `Atlas/Queued/17`, `Atlas/Active/31`, `Beacon/Queued/22`, and `Cirrus/Queued/9`."
+    },
+    {
+     "keyword": "WHEN",
+     "content": "The visitor opens `EVO-M04-FILTER-SAVE`, creates a filter for D3:F7, applies `Text contains` value `Atlas` to \"Filter Workstream\", applies `Greater than` value `20` to \"Filter Load\", opens \"Save filter view\", enters `Atlas active load` in \"Filter view name\", and clicks \"Save view\"."
+    },
+    {
+     "keyword": "THEN",
+     "content": "Only row 5 containing `Atlas/Active/31` is visible, and after refresh \"Filter views\" contains exactly `Atlas active load` with the same visible row."
+    }
+   ]
+  },
+  {
+   "name": "REQ-5-1-2 - apply a persisted saved filter view",
+   "steps": [
+    {
+     "keyword": "GIVEN",
+     "content": "The visitor is unauthenticated and the system pre-provisions workbook `EVO-M04-FILTER-APPLY` with active worksheet `Workload`, range D3:F7 headed `Workstream/Phase/Load`, and saved filter view `Queued lanes` selecting Phase values `Queued`."
+    },
+    {
+     "keyword": "WHEN",
+     "content": "The visitor opens `EVO-M04-FILTER-APPLY`, opens \"Filter views\" in the \"Data\" menu, and clicks `Queued lanes`."
+    },
+    {
+     "keyword": "THEN",
+     "content": "Rows containing `Atlas/Queued/17`, `Beacon/Queued/22`, and `Cirrus/Queued/9` are visible while the `Atlas/Active/31` row is hidden; the same state remains after refresh."
+    }
+   ]
+  },
+  {
+   "name": "REQ-5-1-2 - reject and delete a saved filter view",
+   "steps": [
+    {
+     "keyword": "GIVEN",
+     "content": "The visitor is unauthenticated and the system pre-provisions workbook `EVO-M04-FILTER-DELETE` with active worksheet `Workload`, range D3:F7 headed `Workstream/Phase/Load`, and saved filter view `Queued lanes`."
+    },
+    {
+     "keyword": "WHEN",
+     "content": "The visitor opens `EVO-M04-FILTER-DELETE`, creates a filter for D3:F7, opens \"Save filter view\", enters ` queued lanes ` in \"Filter view name\", clicks \"Save view\", then opens \"Filter views\", chooses `Queued lanes`, and clicks \"Delete filter view\"."
+    },
+    {
+     "keyword": "THEN",
+     "content": "The exact message \"Filter view name already exists\" is visible after the first save attempt; after deletion \"Filter views\" no longer contains `Queued lanes`, all source rows remain visible, and the deletion persists after refresh."
+    }
+   ]
+  }
+ ]
+}

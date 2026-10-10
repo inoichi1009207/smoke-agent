@@ -1,0 +1,134 @@
+{
+ "checkpoint": {
+  "keys": [
+   "all_test_files",
+   "audit_rollback_evidence",
+   "audit_rolled_back_fingerprints",
+   "audit_routed",
+   "audit_sent_fingerprints",
+   "contract",
+   "debt_specs",
+   "description",
+   "description_pass",
+   "description_specs",
+   "digest",
+   "done",
+   "e2e_specs",
+   "failed_members",
+   "file_specs",
+   "green_specs",
+   "llm_tokens_total",
+   "no_evidence_members",
+   "open_findings",
+   "partial_green",
+   "regression_debts",
+   "report",
+   "req_sha",
+   "revised_specs",
+   "seed_checks",
+   "seed_quarantine",
+   "seed_quarantine_switch",
+   "sources",
+   "spec_context",
+   "spec_defects",
+   "spent_sec",
+   "test_ids_by_file",
+   "test_snapshot",
+   "test_titles",
+   "unattempted_members",
+   "unknown_debts"
+  ]
+ },
+ "findings": {
+  "layer": [
+   {
+    "fix": "Fix the cause (failed request on load, exception during render, missing asset).",
+    "problem": "Error in the browser console while loading the page: Failed to load resource: 404",
+    "requirement": "(pages must load without errors)",
+    "where": "route /"
+   },
+   {
+    "fix": "Render “Export CSV” as <button type=\"button\"> -- role button, accessible name exactly “Export CSV” -- in place of the element it is now; keep what it does.",
+    "problem": "The requirement states a button named “Export CSV”, but every place the sources render that name gives it another role: frontend/src/components/Toolbar.tsx:1 text inside <a> -> role link. Whoever looks for the button by its name finds none.",
+    "requirement": "(the requirement: a button named “Export CSV”) The toolbar has an “Export CSV” button",
+    "where": "frontend/src/components/Toolbar.tsx:1"
+   },
+   {
+    "fix": "Keep that heading as it is -- it is not the control -- and ADD <a href> / router <Link> -- role link, accessible name exactly “Profile” -- where the requirement places it.",
+    "problem": "The requirement states a link named “Profile”, but every place the sources render that name gives it another role: frontend/src/pages/Settings.tsx:3 text inside <h2> -> role heading. Whoever looks for the link by its name finds none.",
+    "requirement": "(the requirement: a link named “Profile”) The settings page has a “Save” button and a “Profile” link",
+    "where": "frontend/src/pages/Settings.tsx:3"
+   },
+   {
+    "fix": "Make the accessible name unique on the page at any one time: if the requirement states different names for these controls, use them; if it states this same name for both, render only one of them at a time (e.g. leave the other out while this form is open). Never rename a control to a name the requirement does not state.",
+    "problem": "Page component Access (frontend/src/pages/Access.tsx) renders two combobox controls with the same accessible name \"Role\" at the same time: frontend/src/pages/Access.tsx:3 and frontend/src/pages/Access.tsx:4. A lookup by role and exact name finds more than one element, and a user cannot tell them apart.",
+    "requirement": "Role",
+    "where": "duplicate_names: frontend/src/pages/Access.tsx:3"
+   },
+   {
+    "fix": "Make the accessible name unique on the page at any one time: if the requirement states different names for these controls, use them; if it states this same name for both, render only one of them at a time (e.g. leave the other out while this form is open). Never rename a control to a name the requirement does not state.",
+    "problem": "Page component Access (frontend/src/pages/Access.tsx) renders two textbox controls with the same accessible name \"Team\" at the same time: frontend/src/pages/Access.tsx:5 and frontend/src/pages/Access.tsx:6. A lookup by role and exact name finds more than one element, and a user cannot tell them apart.",
+    "requirement": "Team",
+    "where": "duplicate_names: frontend/src/pages/Access.tsx:5"
+   }
+  ],
+  "messages": [
+   {
+    "fix": "Implement the stated failure/notice case so the page visibly shows exactly this text when it happens (the server's 4xx answer may carry it; the page must render it verbatim).",
+    "problem": "The requirement (L-A) states the page displays \"Name is required\" (the page displays …). This text occurs nowhere in the frontend or backend sources, although the leaf's page exists (it shows \"Create thing A\" at frontend/src/pages/P.tsx:1).",
+    "requirement": "L-A: \"Name is required\"",
+    "where": "stated_messages: frontend/src/pages/P.tsx:1"
+   },
+   {
+    "fix": "Implement the stated failure/notice case so the page visibly shows exactly this text when it happens (the server's 4xx answer may carry it; the page must render it verbatim).",
+    "problem": "The requirement (L-B1) states the page displays \"Name must be 50 characters or fewer\" (the page displays …). This text occurs nowhere in the frontend or backend sources, although the leaf's page exists (it shows \"Rename thing B\" at frontend/src/pages/P.tsx:1).",
+    "requirement": "L-B1: \"Name must be 50 characters or fewer\"",
+    "where": "stated_messages: frontend/src/pages/P.tsx:1"
+   }
+  ],
+  "nav": [
+   {
+    "fix": "Where the requirement places it (the toolbar), render a button whose accessible name is exactly “Export CSV” and that goes where the requirement says. It replaces the control of that name with the other role, unless the requirement names that one too.",
+    "problem": "The requirement states a button named “Export CSV” (the toolbar), but every control of that name has another role: link. Whoever looks for the button by its name finds none.",
+    "requirement": "(the requirement: the “Export CSV” button opens the export)",
+    "where": "L-B: button “Export CSV”"
+   },
+   {
+    "fix": "Where the requirement places it (s), render a link whose accessible name is exactly “Sort range” and that goes where the requirement says (<Link to=...>). Keep the heading or text of that name as it is.",
+    "problem": "The requirement states a link named “Sort range” (s), but the name only occurs as plain text (a heading or paragraph), never on a control: h1.",
+    "requirement": "(the requirement: q)",
+    "where": "L-A: link “Sort range”"
+   }
+  ],
+  "walk": [
+   {
+    "fix": "The page reached by \"Settings\" must expose a visible link/tab/button named exactly \"Active sessions\" (the requirement's path).",
+    "problem": "Stated path (L-D; S1; account owner): after signing in and clicking “Account menu” → “Settings”, step 3 “Active sessions” has no visible link/button/tab/menuitem on /settings. Visible controls: “Profile”.",
+    "requirement": "Account menu → Settings → Active sessions",
+    "where": "outsider-walk: rendered app, frontend/src (route /settings)"
+   },
+   {
+    "fix": "The page reached by \"sign-in landing\" must expose a visible link/tab/button named exactly \"Sort range\" (the requirement's path).",
+    "problem": "Stated path (L-C; S2; account owner): after signing in and clicking no navigation controls (zero clicks), step 1 “Sort range” has no visible link/button/tab/menuitem on /. Visible controls: (none).",
+    "requirement": "Sort range",
+    "where": "outsider-walk: rendered app, frontend/src (route /)"
+   }
+  ]
+ },
+ "process_node": {
+  "extra_context": [
+   ""
+  ],
+  "passed": true
+ },
+ "run_queue": {
+  "new_attributes": [
+   "foundation_ids"
+  ],
+  "open_findings": 0,
+  "passed": false,
+  "unattempted": [
+   "L-C"
+  ]
+ }
+}

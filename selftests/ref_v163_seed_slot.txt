@@ -1,0 +1,102 @@
+# v163d selftest reference (selftests/cases_v163d_staged.py): Factory.evolution_seed_foundation_slot exactly as v163
+# shipped it before v163d (copied byte for byte from the v162 tree, where it is identical). Not imported by the agent.
+    def evolution_seed_foundation_slot(self) -> None:
+        """v162a (ADR 二二六): before batch 1, ONE bounded implementer task (evolution_seed_foundation_sec) that adds every
+        fixture the round's scenarios state as pre-provisioned as one versioned, idempotent data migration (and, on a
+        sheet, makes the grid reach the largest stated cell when the start-up extent probe found it short). Kept only
+        when afterwards (a) the app starts on an empty database, restarts, and upgrades the inherited database without a
+        data-lifecycle finding, (b) fewer stated names are missing and none newly, no name sits under another display
+        name, and a stated extent finding is gone (not run = not established, does not block), and (c) no protected
+        inherited spec newly fails; otherwise every source is put back. Booked in the health book (a resumed run does
+        not repeat it). Never raises."""
+        state = self.evolution_state()
+        if not state or not setting_on("evolution_seed_foundation"):
+            return
+        inv = self.__dict__.get("seed_inventory")
+        if not isinstance(inv, dict) or not inv.get("names"):
+            return
+        book = state.setdefault("health", {})
+        if book.get("seed_foundation"):
+            return
+        began = clock.now()
+        slot = setting_seconds("evolution_seed_foundation_sec", 1500.0)
+        book["seed_foundation"] = {"status": "started"}
+        try:
+            if not self.hard_fits("the seed foundation slot", slot):
+                book["seed_foundation"] = {"status": "not run: no time"}
+                log("[seed-foundation] not run: the slot does not fit before the hard end")
+                return
+            missing0, report0, others0 = self.seed_foundation_names(inv)
+            ext = inv.get("extent") or {}
+            extent_row = next((r for r in book.get("health_check") or [] if isinstance(r, dict) and r.get("item") == "extent"), {})
+            extent_short = bool(ext.get("grid")) and str(extent_row.get("status")) == "findings"
+            if not report0.get("completed") and not missing0:
+                book["seed_foundation"] = {"status": "not run: the fixture check did not complete",
+                                           "notes": (report0.get("notes") or [])[-3:]}
+                log(f"[seed-foundation] not run: the fixture check did not complete ({(report0.get('notes') or ['?'])[-1]})")
+                return
+            log(f"[seed-foundation] before: {len(missing0)} of {len(inv.get('names') or [])} stated name(s) missing, "
+                f"{len(report0.get('misplaced') or {})} under another display name, {len(others0)} other lifecycle finding(s); "
+                f"grid extent {ext.get('cell') or 'n/a'}: {extent_row.get('status') or 'n/a'}")
+            for scenario, bad in list((report0.get("missing") or {}).items())[:40]:
+                log(f"[seed-foundation]   missing in {scenario}: {bad}")
+            if not missing0 and not extent_short:
+                book["seed_foundation"] = {"status": "clean", "seconds": round(clock.now() - began, 1)}
+                log("[seed-foundation] kept: nothing to add (every stated name is present under its display name)")
+                return
+            misplaced0 = dict(report0.get("misplaced") or {})
+            text = seed_foundation.foundation_text(inv)
+            if not extent_short:
+                text = "\n".join(line for line in text.splitlines() if not line.startswith("- The worksheet grid must render"))
+            text += ("\n\nThe deterministic fixture check (empty database, then the app's own initialisation) does not "
+                     f"find these {len(missing0)} stated name(s) as a record's own display name: "
+                     + ", ".join(f"`{n}`" for n in missing0[:120])
+                     + ("".join(f"\n- `{n}`: {why}" for n, why in list(misplaced0.items())[:20]) if misplaced0 else ""))
+            if extent_short:
+                text += "\n\nThe start-up extent probe: " + str(extent_row.get("result") or "")[:400]
+
+            def check() -> StepResult:
+                missing, report, others = self.seed_foundation_names(inv)
+                problems: list[str] = []
+                if not report.get("completed") and not missing:
+                    problems.append("the fixture check did not complete: " + "; ".join(str(n) for n in (report.get("notes") or [])[-2:]))
+                problems += [f"{f.get('check')}: {str(f.get('problem') or '')[:400]}" for f in others
+                             if str(f.get("check")) not in {str(o.get("check")) for o in others0}]
+                new_missing = [n for n in missing if n not in missing0]
+                if new_missing:
+                    problems.append("names that were present are now missing: " + ", ".join(f"`{n}`" for n in new_missing[:20]))
+                if report.get("misplaced"):
+                    problems.append("under another display name: " + "; ".join(f"`{n}` ({w})" for n, w in list(report["misplaced"].items())[:10]))
+                if missing and len(missing) >= len(missing0):
+                    problems.append(f"still missing ({len(missing)}): " + ", ".join(f"`{n}`" for n in missing[:60]))
+                if extent_short and not problems:
+                    row = self.seed_foundation_extent(began + slot)
+                    if row.get("status") == "findings":
+                        problems.append("grid extent: " + str(row.get("result") or "")[:400])
+                    else:
+                        log(f"[seed-foundation] grid extent after the slot: {row.get('status')} -- {str(row.get('result') or '')[:200]}")
+                book["seed_foundation"]["missing_after"] = missing
+                return StepResult(not problems, "\n".join(problems) if problems else
+                                  f"fixtures: {len(missing0) - len(missing)} of {len(missing0)} missing name(s) added")
+
+            before = self.snapshot_sources()
+            kept = self.repair_round("seed-foundation", check, text, deadline=began + slot)
+            status = "kept" if kept else "rolled back"
+            if kept and self.protected_specs():
+                specs = self.foundation_run_list((), self.CONTINUATION_END_RUN_SEC, "after the seed foundation")
+                run = run_e2e(self.project_dir, specs, log=log)
+                cont = self.continuation if isinstance(self.__dict__.get("continuation"), dict) else {}
+                newly = sorted(failed_spec_names(str(run.output or "")) - set(cont.get("baseline_red") or {})) if not run.ok and not run.skipped else []
+                if newly or (not run.ok and not run.skipped and not failed_spec_names(str(run.output or ""))):
+                    restored = self.restore_sources(before)
+                    status = "rolled back"
+                    log(f"[seed-foundation] the migration broke protected specs {newly or '(a run naming none)'}; {restored} file(s) put back")
+            left = list(book["seed_foundation"].get("missing_after") or []) if status == "kept" else missing0
+            book["seed_foundation"] = {"status": status, "seconds": round(clock.now() - began, 1), "missing_before": len(missing0),
+                                       "missing_after": left}
+            log(f"[seed-foundation] {status}: {len(missing0) - len(left)} of {len(missing0)} missing name(s) added in "
+                f"{int(clock.now() - began)} s (at most {int(slot)} s); still missing: {left[:30]}")
+        except Exception as exc:  # noqa: BLE001
+            book["seed_foundation"] = {"status": f"crashed: {type(exc).__name__}", "seconds": round(clock.now() - began, 1)}
+            log(f"[seed-foundation] rolled back: the slot crashed: {exc!r}")
+
